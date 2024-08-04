@@ -1,5 +1,6 @@
 use image::{self, DynamicImage, GenericImageView, ImageResult, Pixel, Rgba};
 use std::{fs::File, io::Write};
+
 const IMG_PATH: &str = "makima.png";
 
 fn load_image(path: &str) -> ImageResult<DynamicImage> {
@@ -44,6 +45,13 @@ fn threshold_ascii(image: &DynamicImage) -> String {
     ascii_art
 }
 
+fn get_ascii_art<F>(func: F, image: &DynamicImage) -> String
+where
+    F: Fn(&DynamicImage) -> String,
+{
+    func(image)
+}
+
 fn main() {
     match load_image(IMG_PATH) {
         Ok(x) => {
@@ -51,7 +59,7 @@ fn main() {
             let (x, y) = (img.width(), img.height());
             println!("Image dimensions are: {} x {}", x, y);
             let mut file = File::create("test.txt").unwrap();
-            let result = threshold_ascii(&img);
+            let result = get_ascii_art(threshold_ascii, &img);
             file.write_all(result.as_bytes()).unwrap();
         }
         Err(err) => println!("Error: {}", err),
